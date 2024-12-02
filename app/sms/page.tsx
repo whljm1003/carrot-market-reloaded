@@ -1,5 +1,5 @@
 import FormButton from "@/components/form-btn";
-import FormInput from "@/components/form-input";
+import FormInput from "@/components/input";
 export default function SMSLogin() {
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
