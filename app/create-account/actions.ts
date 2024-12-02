@@ -1,11 +1,30 @@
 "use server";
 import { z } from "zod";
-const formSchema = z.object({
-  username: z.string(),
-  email: z.string().email(),
-  password: z.string().min(10),
-  confirm_password: z.string().min(10),
-});
+const formSchema = z
+  .object({
+    username: z
+      .string({
+        invalid_type_error: "Username must be a string!",
+        required_error: "where is my username????",
+      })
+      .min(3, "Way too short!!!")
+      .max(10, "That is too looooong!")
+      .refine((username) => !username.includes("potato")),
+
+    email: z.string().email(),
+    password: z.string().min(10),
+    confirm_password: z.string().min(10),
+  })
+  .superRefine(({ password, confirm_password }, ctx) => {
+    if (password !== confirm_password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Tow passwords should be equal",
+        path: ["confirm_password"],
+      });
+    }
+  });
+
 export async function createAccount(prevState: any, formData: FormData) {
   const data = {
     username: formData.get("username"),
