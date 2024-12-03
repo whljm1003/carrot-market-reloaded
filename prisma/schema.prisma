@@ -1,8 +1,15 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// prisma
+// npm i prisma 
+// npm install @prisma/client - 데이터에 맞춰 자동 생성되는 type-safe 쿼리 빌더
+// npx prisma studio
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// npx prisma init - prisma 초기화
+// npx prisma migrate dev 
+// 1. 데이터베이스 변경 사항을 확인하고, 수정되었거나 삭제된 부분을 찾습니다.
+// 2. 새로운 변경 사항이 있다면, 그것을 시험해 볼 수 있는 별도의 데이터베이스에 먼저 적용합니다. (테스트 목적)
+// 3. 데이터 모델에 변화가 있으면, 그에 맞는 새로운 마이그레이션을 만듭니다.
+// 4. 모든 새로운 마이그레이션을 실제 데이터베이스에 적용하고, 이를 기록합니다.
+// 5. 필요한 코드를 자동으로 생성합니다. (Prisma Client 등..)
 
 generator client {
   provider = "prisma-client-js"
@@ -31,6 +38,12 @@ model SMSToken {
   token      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // on Delete
+  //  Cascade: 참조 레코드를 삭제하면 참조 레코드의 삭제가 트리거됩니다.
+  // Restrict: 참조 레코드가 있는 경우 삭제를 방지합니다. (기본값)
+  // NoAction: Restrict과 유사하지만 사용 중인 데이터베이스에 따라 다릅니다.
+  // SetNull: 참조 필드가 NULL로 설정됩니다. (optional일 때만 정상 작동)
+  // SetDefault: 참조 필드가 기본값으로 설정됩니다.
   userId     Int
 }
