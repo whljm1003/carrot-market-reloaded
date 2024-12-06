@@ -5,11 +5,10 @@ import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
 import { useFormState } from "react-dom";
 import { createAccount } from "./actions";
-import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccount, null);
-
+  console.log("state->", state);
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
       <div className="flex flex-col gap-2 *:font-medium">
@@ -23,7 +22,7 @@ export default function CreateAccount() {
           placeholder="Username"
           required
           errors={state?.fieldErrors.username}
-          minLength={PASSWORD_MIN_LENGTH}
+          minLength={3}
           maxLength={10}
         />
         <Input
@@ -37,7 +36,7 @@ export default function CreateAccount() {
           name="password"
           type="password"
           placeholder="Password"
-          minLength={PASSWORD_MIN_LENGTH}
+          minLength={4}
           required
           errors={state?.fieldErrors.password}
         />
@@ -46,6 +45,7 @@ export default function CreateAccount() {
           type="password"
           placeholder="Confirm Password"
           required
+          minLength={4}
           errors={state?.fieldErrors.confirm_password}
         />
         <Button text="Create account" />
