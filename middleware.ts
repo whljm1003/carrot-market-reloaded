@@ -1,10 +1,31 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import getSession from "./lib/session";
 
-export async function middleware(request: NextRequest) {
-  console.log("hello");
+interface Routes {
+  [key: string]: boolean;
 }
 
-// matcher를 사용하면 matcher에 지정한 특정 경로들에서만 미들웨어가 실행되도록 할 수 있습니다.
+const publicOnlyUrls: Routes = {
+  "/": true,
+  "/login": true,
+  "/sms": true,
+  "/create-account": true,
+};
+
+export async function middleware(request: NextRequest) {
+  const session = await getSession();
+  const exists = publicOnlyUrls[request.nextUrl.pathname];
+  if (!session.id) {
+    if (!exists) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  } else {
+    if (exists) {
+      return NextResponse.redirect(new URL("/products", request.url));
+    }
+  }
+}
+
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
