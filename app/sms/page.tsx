@@ -39,7 +39,7 @@ export default function SMSLogin() {
             errors={state.error?.formErrors}
           />
         )}
-        <Button text={state.token ? "Verify Token" : "Send verification SMS"} />
+        <Button text={state.token ? "Verify Token" : "Send Verification SMS"} />
       </form>
     </div>
   );
