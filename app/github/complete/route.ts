@@ -1,6 +1,6 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 // github - 문서 https://docs.github.com/ko/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
