@@ -5,11 +5,23 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { getUploadUrl, uploadProduct } from "./actions";
 import { useFormState } from "react-dom";
+import { useForm } from "react-hook-form";
+import { productSchema, ProductType } from "./schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
-  const [photoId, setImageId] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductType>({
+    resolver: zodResolver(productSchema),
+  });
+
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -29,16 +41,19 @@ export default function AddProduct() {
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadUrl } = result;
       setUploadUrl(uploadUrl);
-      setImageId(id);
+      setValue(
+        "photo",
+        `https://imagedelivery.net/aSbksvJjax-AUC7qVnaC4A/${id}`
+      );
     }
   };
 
-  const interceptAction = async (_: any, formData: FormData) => {
-    const file = formData.get("photo");
+  const onSubmit = handleSubmit(async (data: ProductType) => {
     if (!file) {
       return;
     }
@@ -48,19 +63,24 @@ export default function AddProduct() {
       method: "POST",
       body: cloudflareForm,
     });
-    console.log(await response.text());
     if (response.status !== 200) {
       return;
     }
-    const photoUrl = `https://imagedelivery.net/aSbksvJjax-AUC7qVnaC4A/${photoId}`;
-    formData.set("photo", photoUrl);
-    return uploadProduct(_, formData);
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("price", data.price + "");
+    formData.append("description", data.description);
+    formData.append("photo", data.photo);
+    return uploadProduct(formData);
+  });
+
+  const onValid = async () => {
+    await onSubmit();
   };
 
-  const [state, action] = useFormState(interceptAction, null);
   return (
     <div>
-      <form action={action} className="p-5 flex flex-col gap-5">
+      <form action={onValid} className="p-5 flex flex-col gap-5">
         <label
           htmlFor="photo"
           className="border-2 aspect-square flex items-center justify-center flex-col text-neutral-300 border-neutral-300 rounded-md border-dashed cursor-pointer bg-center bg-cover"
@@ -73,7 +93,7 @@ export default function AddProduct() {
               <PhotoIcon className="w-20" />
               <div className="text-neutral-400 text-sm">
                 사진을 추가해주세요.
-                {state?.fieldErrors.photo}
+                {errors?.photo?.message}
               </div>
             </>
           ) : null}
@@ -87,25 +107,25 @@ export default function AddProduct() {
           className="hidden"
         />
         <Input
-          name="title"
           required
           placeholder="제목"
           type="text"
-          errors={state?.fieldErrors.title}
+          {...register("title")}
+          errors={[errors.title?.message ?? ""]}
         />
         <Input
-          name="price"
           type="number"
           required
           placeholder="가격"
-          errors={state?.fieldErrors.price}
+          {...register("price")}
+          errors={[errors.price?.message ?? ""]}
         />
         <Input
-          name="description"
           type="text"
           required
           placeholder="자세한 설명"
-          errors={state?.fieldErrors.description}
+          {...register("description")}
+          errors={[errors.description?.message ?? ""]}
         />
         <Button text="작성 완료" />
       </form>
