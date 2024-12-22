@@ -4,7 +4,6 @@ import Input from "@/components/input";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { getUploadUrl, uploadProduct } from "./actions";
-import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import { productSchema, ProductType } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +16,7 @@ export default function AddProduct() {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<ProductType>({
     resolver: zodResolver(productSchema),
@@ -42,6 +42,8 @@ export default function AddProduct() {
     const url = URL.createObjectURL(file);
     setPreview(url);
     setFile(file);
+
+    // cloudflare images url upload
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadUrl } = result;
@@ -57,6 +59,8 @@ export default function AddProduct() {
     if (!file) {
       return;
     }
+
+    // cloudflare images upload
     const cloudflareForm = new FormData();
     cloudflareForm.append("file", file);
     const response = await fetch(uploadUrl, {
@@ -71,7 +75,10 @@ export default function AddProduct() {
     formData.append("price", data.price + "");
     formData.append("description", data.description);
     formData.append("photo", data.photo);
-    return uploadProduct(formData);
+    const errors = await uploadProduct(formData);
+    if (errors) {
+      // setError("")
+    }
   });
 
   const onValid = async () => {
