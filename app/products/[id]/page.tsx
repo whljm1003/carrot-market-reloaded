@@ -37,12 +37,13 @@ export default async function ProductDetail({
 }: {
   params: { id: string };
 }) {
-  const id = Number(params.id);
+  const { id } = await params;
+  const productId = Number(id);
 
-  if (isNaN(id)) {
+  if (isNaN(productId)) {
     return notFound();
   }
-  const product = await getProduct(id);
+  const product = await getProduct(productId);
   if (!product) {
     return notFound();
   }
@@ -53,7 +54,7 @@ export default async function ProductDetail({
     "use server";
     await db.product.delete({
       where: {
-        id,
+        id: productId,
       },
       select: {
         id: true,
