@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { formatToWon } from "@/lib/utils";
 import Link from "next/link";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -15,6 +16,7 @@ async function getIsOwner(userId: number) {
 }
 
 async function getProduct(id: number) {
+  console.log("product");
   const product = await db.product.findUnique({
     where: {
       id,
@@ -32,8 +34,30 @@ async function getProduct(id: number) {
   return product;
 }
 
+const getCashedProduct = nextCache(getProduct, ["product-detail"], {
+  tags: ["product-detail", "xxxx"],
+});
+
+async function getProductTitle(id: number) {
+  console.log("title");
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      title: true,
+    },
+  });
+
+  return product;
+}
+
+const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
+  tags: ["product-title", "xxxx"],
+});
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const product = await getProduct(Number(params.id));
+  const product = await getCachedProductTitle(Number(params.id));
   return {
     title: product?.title,
   };
@@ -50,12 +74,16 @@ export default async function ProductDetail({
   if (isNaN(productId)) {
     return notFound();
   }
-  const product = await getProduct(productId);
+  const product = await getCashedProduct(productId);
   if (!product) {
     return notFound();
   }
 
   const isOwner = await getIsOwner(product.userId);
+  const revalidate = async () => {
+    "use server";
+    revalidateTag("xxxx");
+  };
 
   const onDeleteProduct = async () => {
     "use server";
@@ -101,6 +129,11 @@ export default async function ProductDetail({
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p>{product.description}</p>
       </div>
+      <form action={revalidate}>
+        <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold">
+          Revalidate title cache
+        </button>
+      </form>
       <div className="fixed w-full bottom-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center max-w-screen-sm">
         <span className="font-semibold text-xl">
           {formatToWon(product.price)}원
