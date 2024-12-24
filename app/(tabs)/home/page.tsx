@@ -6,7 +6,9 @@ import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { unstable_cache as nextCache } from "next/cache";
 
-const getCashedProducts = nextCache(getInitialProducts, ["home-products"]);
+const getCashedProducts = nextCache(getInitialProducts, ["home-products"], {
+  revalidate: 60,
+});
 
 async function getInitialProducts() {
   console.log("hit!!!!!");
