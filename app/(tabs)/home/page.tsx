@@ -29,8 +29,11 @@ export type InitialProducts = Prisma.PromiseReturnType<
   typeof getInitialProducts
 >;
 
+// export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
 export default async function Products() {
-  const initialProducts = await getCashedProducts();
+  const initialProducts = await getInitialProducts();
   const revalidate = async () => {
     "use server";
     revalidatePath("/home");
