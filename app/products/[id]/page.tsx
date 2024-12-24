@@ -5,7 +5,11 @@ import { notFound, redirect } from "next/navigation";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { formatToWon } from "@/lib/utils";
 import Link from "next/link";
-import { unstable_cache as nextCache, revalidateTag } from "next/cache";
+import {
+  unstable_cache as nextCache,
+  revalidatePath,
+  revalidateTag,
+} from "next/cache";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -16,6 +20,13 @@ async function getIsOwner(userId: number) {
 }
 
 async function getProduct(id: number) {
+  // fetch 에서도 revalidate, tags 기능 제공
+  // fetch("https://api.com", {
+  //   next: {
+  //     revalidate: 60,
+  //     tags: ["hello"],
+  //   },
+  // });
   console.log("product");
   const product = await db.product.findUnique({
     where: {
@@ -35,7 +46,7 @@ async function getProduct(id: number) {
 }
 
 const getCashedProduct = nextCache(getProduct, ["product-detail"], {
-  tags: ["product-detail", "xxxx"],
+  tags: ["product-detail"],
 });
 
 async function getProductTitle(id: number) {
@@ -53,7 +64,7 @@ async function getProductTitle(id: number) {
 }
 
 const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
-  tags: ["product-title", "xxxx"],
+  tags: ["product-title"],
 });
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
@@ -82,7 +93,7 @@ export default async function ProductDetail({
   const isOwner = await getIsOwner(product.userId);
   const revalidate = async () => {
     "use server";
-    revalidateTag("xxxx");
+    revalidateTag("product-detail");
   };
 
   const onDeleteProduct = async () => {
