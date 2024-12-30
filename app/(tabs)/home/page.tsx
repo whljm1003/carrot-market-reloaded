@@ -9,7 +9,6 @@ import { unstable_cache as nextCache, revalidatePath } from "next/cache";
 const getCashedProducts = nextCache(getInitialProducts, ["home-products"]);
 
 async function getInitialProducts() {
-  console.log("hit!!!!!");
   const products = await db.product.findMany({
     select: {
       title: true,
@@ -30,7 +29,7 @@ export type InitialProducts = Prisma.PromiseReturnType<
 >;
 
 // export const dynamic = "force-dynamic";
-export const revalidate = 60;
+// export const revalidate = 60;
 
 export default async function Products() {
   const initialProducts = await getInitialProducts();
