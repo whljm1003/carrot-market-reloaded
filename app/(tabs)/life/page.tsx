@@ -1,7 +1,5 @@
 import React from "react";
 
-type Props = {};
-
-export default function Life({}: Props) {
+export default function Life() {
   return <div>Life</div>;
 }

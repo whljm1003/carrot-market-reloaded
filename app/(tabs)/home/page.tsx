@@ -5,6 +5,7 @@ import Link from "next/link";
 import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { unstable_cache as nextCache, revalidatePath } from "next/cache";
+import { PRODUCT_LIST_TAKE } from "@/lib/constants";
 
 const getCashedProducts = nextCache(getInitialProducts, ["home-products"]);
 
@@ -17,6 +18,7 @@ async function getInitialProducts() {
       photo: true,
       id: true,
     },
+    take: PRODUCT_LIST_TAKE,
     orderBy: {
       created_at: "desc",
     },
@@ -45,7 +47,7 @@ export default async function Products() {
         <button>Revalidate</button>
       </form>
       <Link
-        href="/products/add"
+        href="/product/add"
         className="bg-orange-500 flex items-center justify-center rounded-full size-16 fixed bottom-24 right-8 text-white transition-colors hover:bg-orange-400"
       >
         <PlusIcon className="size-10" />

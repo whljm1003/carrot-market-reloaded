@@ -28,7 +28,9 @@ export default function ProductList({ initialProducts }: ProductListProps) {
         if (element.isIntersecting && trigger.current) {
           observer.unobserve(trigger.current);
           setIsLoading(true);
+          console.log(page);
           const newProducts = await getMoreProducts(page + 1);
+          console.log("newProducts->", newProducts);
           if (newProducts.length !== 0) {
             setProducts((prev) => [...prev, ...newProducts]);
             setPage((prev) => prev + 1);
@@ -51,22 +53,23 @@ export default function ProductList({ initialProducts }: ProductListProps) {
     };
   }, [page]);
 
+  console.log(products);
   return (
     <div className="p-5 flex flex-col gap-5">
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {/* {!isLastPage ? (
+      {!isLastPage ? (
         <span
           ref={trigger}
-          style={{
-            marginTop: `${page + 1 * 900}vh`,
-          }}
+          // style={{
+          //   marginTop: `${page + 1 * 900}vh`,
+          // }}
           className="text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95"
         >
           {isLoading ? "로딩 중" : "Load more"}
         </span>
-      ) : null} */}
+      ) : null}
     </div>
   );
 }

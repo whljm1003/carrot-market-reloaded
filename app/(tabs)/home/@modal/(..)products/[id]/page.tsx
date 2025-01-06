@@ -23,8 +23,11 @@ const getProduct = (id: number) => {
   return product;
 };
 
-export default async function Modal({ params }: { params: { id: string } }) {
-  // params를 await로 처리
+export default async function Modal({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const productId = Number(id);
 

@@ -36,7 +36,7 @@ export default function AddProduct() {
     const fileSizeInMd = file.size / (1024 * 1024);
     if (fileSizeInMd > 2) {
       return alert(
-        "이미지의 크기가 2MD를 초과하는 이미지는 업로드 할 수 없습니다."
+        "이미지의 크기가 2MB를 초과하는 이미지는 업로드 할 수 없습니다."
       );
     }
     const url = URL.createObjectURL(file);
@@ -52,6 +52,9 @@ export default function AddProduct() {
         "photo",
         `https://imagedelivery.net/aSbksvJjax-AUC7qVnaC4A/${id}`
       );
+    } else {
+      // cloudflare 실패 시 임시 이미지 업로드
+      setValue("photo", "/bossam.jpg");
     }
   };
 
@@ -61,15 +64,15 @@ export default function AddProduct() {
     }
 
     // cloudflare images upload
-    const cloudflareForm = new FormData();
-    cloudflareForm.append("file", file);
-    const response = await fetch(uploadUrl, {
-      method: "POST",
-      body: cloudflareForm,
-    });
-    if (response.status !== 200) {
-      return;
-    }
+    // const cloudflareForm = new FormData();
+    // cloudflareForm.append("file", file);
+    // const response = await fetch(uploadUrl, {
+    //   method: "POST",
+    //   body: cloudflareForm,
+    // });
+    // if (response.status !== 200) {
+    //   return;
+    // }
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("price", data.price + "");
@@ -77,6 +80,7 @@ export default function AddProduct() {
     formData.append("photo", data.photo);
     const errors = await uploadProduct(formData);
     if (errors) {
+      alert(errors);
       // setError("")
     }
   });

@@ -5,6 +5,7 @@ import getSession from "@/lib/session";
 import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import { productSchema } from "./schema";
+import { unstable_cache as nextCache } from "next/cache";
 
 export async function uploadProduct(formData: FormData) {
   const data = {
@@ -13,6 +14,7 @@ export async function uploadProduct(formData: FormData) {
     price: formData.get("price"),
     description: formData.get("description"),
   };
+  // 이미지 클라우드에 저장하지 않을 경우 임시 방법
   // if (data.photo instanceof File) {
   //   const photoData = await data.photo.arrayBuffer();
   //   await fs.appendFile(`./public/${data.photo.name}`, Buffer.from(photoData));
@@ -59,3 +61,25 @@ export async function getUploadUrl() {
   const data = await response.json();
   return data;
 }
+
+export async function getProduct(id: number) {
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+
+  return product;
+}
+
+export const getCashedProduct = nextCache(getProduct, ["product-detail"], {
+  tags: ["product-detail"],
+});

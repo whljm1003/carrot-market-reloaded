@@ -2,7 +2,7 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
-import { UserIcon } from "@heroicons/react/24/solid";
+import { ArrowLeftCircleIcon, UserIcon } from "@heroicons/react/24/solid";
 import { formatToWon } from "@/lib/utils";
 import Link from "next/link";
 import { unstable_cache as nextCache, revalidateTag } from "next/cache";
@@ -54,8 +54,13 @@ const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
   tags: ["product-title"],
 });
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const product = await getCachedProductTitle(Number(params.id));
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const product = await getCachedProductTitle(Number(id));
   return {
     title: product?.title,
   };
@@ -64,7 +69,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function ProductDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const productId = Number(id);
@@ -95,6 +100,7 @@ export default async function ProductDetail({
     });
     redirect("/products");
   };
+
   return (
     <div className="pb-40">
       <div className="relative aspect-square">
@@ -105,6 +111,9 @@ export default async function ProductDetail({
           // src={`${product.photo}/width=500,height=500`}
           alt={product.title}
         />
+        <Link href={"/home"} className="text-white">
+          <ArrowLeftCircleIcon className="z-50 absolute top-2 left-2 size-7" />
+        </Link>
       </div>
       <div className="p-5 flex items-center gap-3 border-b border-x-neutral-700">
         <div className="size-10 overflow-hidden rounded-full">
@@ -127,7 +136,7 @@ export default async function ProductDetail({
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p>{product.description}</p>
       </div>
-      <form action={revalidate}>
+      <form action={revalidate} className="pl-4">
         <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold">
           Revalidate title cache
         </button>
@@ -137,18 +146,26 @@ export default async function ProductDetail({
           {formatToWon(product.price)}원
         </span>
         {isOwner ? (
-          <form action={onDeleteProduct}>
+          <form action={onDeleteProduct} className="pl-4">
             <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold">
               Delete product
             </button>
           </form>
         ) : null}
-        <Link
-          className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
-          href={""}
-        >
-          채팅하기
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            className="bg-orange-300 px-5 py-2.5 rounded-md text-white font-semibold"
+            href={`/product/modify/${product.id}`}
+          >
+            수정하기
+          </Link>
+          <Link
+            className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
+            href={""}
+          >
+            채팅하기
+          </Link>
+        </div>
       </div>
     </div>
   );

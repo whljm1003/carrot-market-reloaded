@@ -30,11 +30,12 @@ export default function ListProduct({
         />
       </div>
       <div className="flex flex-col gap-1 *:text-white">
-        <span className="text-lg">{title}</span>
-        <span className="text-sm text-neutral-500">
+        {/* <span className="text-lg">{title}</span> */}
+        <span className="text-lg">{id}</span>
+        {/* <span className="text-sm text-neutral-500">
           {formatToTimeAgo(created_at.toString())}
         </span>
-        <span className="text-lg font-semibold">{formatToWon(price)}</span>
+        <span className="text-lg font-semibold">{formatToWon(price)}</span> */}
       </div>
     </Link>
   );
