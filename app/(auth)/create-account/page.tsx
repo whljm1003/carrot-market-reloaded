@@ -3,8 +3,9 @@
 import Button from "@/components/button";
 import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
-import { useFormState } from "react-dom";
+
 import { createAccount } from "./actions";
+import { useFormState } from "react-dom";
 
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccount, null);

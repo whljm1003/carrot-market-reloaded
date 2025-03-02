@@ -28,9 +28,9 @@ export default function ProductList({ initialProducts }: ProductListProps) {
         if (element.isIntersecting && trigger.current) {
           observer.unobserve(trigger.current);
           setIsLoading(true);
-          console.log(page);
+          // console.log(page);
           const newProducts = await getMoreProducts(page + 1);
-          console.log("newProducts->", newProducts);
+          // console.log("newProducts->", newProducts);
           if (newProducts.length !== 0) {
             setProducts((prev) => [...prev, ...newProducts]);
             setPage((prev) => prev + 1);
@@ -53,7 +53,7 @@ export default function ProductList({ initialProducts }: ProductListProps) {
     };
   }, [page]);
 
-  console.log(products);
+  // console.log(products);
   return (
     <div className="p-5 flex flex-col gap-5">
       {products.map((product) => (

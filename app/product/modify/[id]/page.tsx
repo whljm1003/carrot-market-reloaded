@@ -20,7 +20,7 @@ export default async function ModifyPage({
   if (!product) {
     return notFound();
   }
-  console.log(product);
+  // console.log(product);
 
   return <ModifyProduct product={product} />;
 }

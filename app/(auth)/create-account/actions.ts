@@ -80,7 +80,7 @@ export async function createAccount(prevState: any, formData: FormData) {
   };
   const result = await formSchema.spa(data);
   if (!result.success) {
-    console.log(result.error.flatten());
+    // console.log(result.error.flatten());
     return result.error.flatten();
   } else {
     // 비밀번호 생성 - https://1password.com/password-generator
