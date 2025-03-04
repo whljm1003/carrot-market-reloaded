@@ -1,11 +1,11 @@
 import db from "@/lib/db";
-import getSession from "@/lib/session";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeftCircleIcon, UserIcon } from "@heroicons/react/24/solid";
 import { formatToWon } from "@/lib/utils";
 import Link from "next/link";
 import { unstable_cache as nextCache, revalidateTag } from "next/cache";
+import ChatForm from "@/components/chat-form";
 
 async function getIsOwner(userId: number) {
   // const session = await getSession();
@@ -159,12 +159,7 @@ export default async function ProductDetail({
           >
             수정하기
           </Link>
-          <Link
-            className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
-            href={""}
-          >
-            채팅하기
-          </Link>
+          <ChatForm productUserId={product.userId} />
         </div>
       </div>
     </div>

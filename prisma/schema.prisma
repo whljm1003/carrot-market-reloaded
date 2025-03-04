@@ -111,8 +111,8 @@ model ChatRoom {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
-  user       User[]
-  message    Message[]
+  users      User[]
+  messages   Message[]
 }
 
 model Message {
