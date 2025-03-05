@@ -1,9 +1,15 @@
 "use client";
 import { InitialChatMessages } from "@/app/chats/[id]/page";
+import { saveMessage } from "@/app/chats/actions";
 import { formatToTimeAgo } from "@/lib/utils";
-import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftCircleIcon,
+  ArrowUpCircleIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/solid";
 import { createClient, RealtimeChannel } from "@supabase/supabase-js";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
 const SUPABASE_PUBLIC_KEY =
@@ -29,6 +35,7 @@ export default function ChatMessagesList({
   const [message, setMessage] = useState("");
   const channel = useRef<RealtimeChannel>();
 
+  // update the message
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { value },
@@ -36,7 +43,8 @@ export default function ChatMessagesList({
     setMessage(value);
   };
 
-  const onSubmit = (event: React.FormEvent) => {
+  // submit the message
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const newMessage = {
       id: Date.now(),
@@ -44,11 +52,12 @@ export default function ChatMessagesList({
       created_at: new Date(),
       userId,
       user: {
-        username: "string",
-        avatar: "xxx",
+        username,
+        avatar,
       },
     };
     setMessages((preMsgs) => [...preMsgs, newMessage]);
+    await saveMessage(message, chatRoomId);
     channel.current?.send({
       type: "broadcast",
       event: "message",
@@ -66,6 +75,7 @@ export default function ChatMessagesList({
     setMessage("");
   };
 
+  // subscribe to the channel
   useEffect(() => {
     const client = createClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_KEY);
     channel.current = client.channel(`room-${chatRoomId}`);
@@ -82,6 +92,9 @@ export default function ChatMessagesList({
 
   return (
     <div className="p-5 flex flex-col gap-5 min-h-screen justify-end">
+      <Link href={"/chat"} className="text-white">
+        <ArrowUturnLeftIcon className="z-50 absolute top-5 left-5 size-7" />
+      </Link>
       {messages.map((message) => (
         <div
           key={message.id}

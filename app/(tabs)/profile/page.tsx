@@ -22,13 +22,12 @@ async function getUser() {
 }
 
 async function Username() {
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  // await new Promise((resolve) => setTimeout(resolve, 10000));
   const user = await getUser();
   return <h1>Welcome! {user?.username}!</h1>;
 }
 
 export default async function Profile() {
-  const user = await getUser();
   const logOut = async () => {
     "use server";
     const session = await getSession();
