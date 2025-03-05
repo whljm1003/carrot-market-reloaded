@@ -2,9 +2,13 @@
 import { InitialChatMessages } from "@/app/chats/[id]/page";
 import { formatToTimeAgo } from "@/lib/utils";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, RealtimeChannel } from "@supabase/supabase-js";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+const SUPABASE_PUBLIC_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4dHdqb3Z2ZmhyZW1wYWlndG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDExNTE0NTYsImV4cCI6MjA1NjcyNzQ1Nn0.N2VtLl-wc9YyEZAGTQ5uEKZFjczBumvaD-wxjWYIIcc";
+const SUPABASE_PUBLIC_URL = "https://yxtwjovvfhrempaigtoe.supabase.co";
 
 type Props = {
   userId: number;
@@ -19,6 +23,7 @@ export default function ChatMessagesList({
 }: Props) {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
+  const channel = useRef<RealtimeChannel>();
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -40,18 +45,26 @@ export default function ChatMessagesList({
       },
     };
     setMessages((preMsgs) => [...preMsgs, newMessage]);
+    channel.current?.send({
+      type: "broadcast",
+      event: "message",
+      payload: { message },
+    });
     setMessage("");
   };
 
   useEffect(() => {
-    const client = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_KEY!
-    );
-    const channel = client.channel(`room-${chatRoomId}`);
-    channel.on("broadcast", { event: "message" }, (payload) => {
-      console.log(payload);
-    });
+    const client = createClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_KEY);
+    channel.current = client.channel(`room-${chatRoomId}`);
+    channel.current
+      .on("broadcast", { event: "message" }, (payload) => {
+        console.log(payload);
+      })
+      .subscribe();
+
+    return () => {
+      channel.current?.unsubscribe();
+    };
   }, [chatRoomId]);
 
   return (
