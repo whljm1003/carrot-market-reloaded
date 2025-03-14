@@ -8,6 +8,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        roboto: ["var(--roboto-text)"],
+        rubick: ["var(--rubick-text)"],
+        metallica: ["var(--metallica-text)"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
